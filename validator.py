@@ -1,5 +1,18 @@
-"""Row validation: airport list loading, single-row checks, record building."""
+import re
+import math
+from datetime import datetime
 
+FLIGHT_ID_RE = re.compile(r"^[A-Za-z0-9]{2,8}$")
+AIRPORT_CODE_RE = re.compile(r"^[A-Z]{3}$")
+DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
+
+def parse_datetime(text: str):
+    if not DATETIME_RE.match(text):
+        return None
+    try:
+        return datetime.strptime(text, "%Y-%m-%d %H:%M")
+    except ValueError:
+        return None
 
 def load_airports(path: str) -> set[str]:
     airports = set()
@@ -13,13 +26,16 @@ def load_airports(path: str) -> set[str]:
 
 
 def validate_row(fields: list[str], airports: set[str]) -> str | None:
-    """Check one CSV row (fields as returned by csv.reader, not yet stripped).
+    if len(fields) != 6:
+        return "WRONG_FIELD_COUNT"
 
-    Return None if the row is valid, otherwise the error code of the
-    FIRST failing check (checks 1-11 in the specification, in order).
-    Does not check for duplicates.
-    """
-    raise NotImplementedError
+    flight_id, origin, destination, departure, arrival, price = [f.strip() for f in fields]
+
+    if not flight_id or not origin or not destination or not departure or not arrival or not price:
+        return "MISSING_FIELD"
+
+    if not FLIGHT_ID_RE.match(flight_id):
+        return "INVALID_FLIGHT_ID"
 
 
 def to_record(fields: list[str]) -> dict:
