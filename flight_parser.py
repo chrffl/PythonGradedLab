@@ -44,5 +44,33 @@ def save_database(records, path):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(records, f, indent=2)
 
+#Using CHATGPT
+def write_errors(messages, log_path):
+    logger = logging.getLogger("flight_parser")
+    logger.setLevel(logging.WARNING)
+    logger.propagate = False
+
+    handler = logging.FileHandler(
+        log_path, mode="w", encoding="utf-8"
+    )
+
+    try:
+        handler.setLevel(logging.WARNING)
+
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s %(levelname)s %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S"
+        ))
+
+        logger.addHandler(handler)
+
+        for message in messages:
+            logger.warning(message)
+
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+#Using CHATGPT
+
 if __name__ == "__main__":
     sys.exit(main())
