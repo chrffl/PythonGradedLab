@@ -37,6 +37,38 @@ def validate_row(fields: list[str], airports: set[str]) -> str | None:
     if not FLIGHT_ID_RE.match(flight_id):
         return "INVALID_FLIGHT_ID"
 
+    if not AIRPORT_CODE_RE.match(origin) or origin not in airports:
+        return "INVALID_ORIGIN"
+
+    if not AIRPORT_CODE_RE.match(destination) or destination not in airports:
+        return "INVALID_DESTINATION"
+
+    if origin == destination:
+        return "SAME_ORIGIN_DESTINATION"
+
+    dep_dt = parse_datetime(departure)
+    if dep_dt is None:
+        return "INVALID_DEPARTURE"
+
+    arr_dt = parse_datetime(arrival)
+    if arr_dt is None:
+        return "INVALID_ARRIVAL"
+
+    if arr_dt <= dep_dt:
+        return "ARRIVAL_NOT_AFTER_DEPARTURE"
+
+    try:
+        price_value = float(price)
+    except ValueError:
+        return "INVALID_PRICE"
+
+    if not math.isfinite(price_value):
+        return "INVALID_PRICE"
+
+    if price_value <= 0:
+        return "NON_POSITIVE_PRICE"
+
+    return None
 
 def to_record(fields: list[str]) -> dict:
     """Turn a valid row into a flight record dictionary.
