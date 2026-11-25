@@ -93,6 +93,45 @@ def process_queries(db, queries_path, response_dir):
     with open(os.path.join(response_dir, filename), "w", encoding="utf-8") as f:
         json.dump(responses, f, indent=2)
 
+def main(argv: list[str] | None = None) -> int:
+    try:
+        args = parse_arguments(argv)
+    except SystemExit as exc:
+        return exc.code
+
+    try:
+        if args.json_db:
+            db = load_database(args.json_db)
+        else:
+            if args.input_file:
+                paths = [args.input_file]
+            else:
+                if not os.path.isdir(args.input_dir):
+                    raise OSError(f"folder not found: {args.input_dir}")
+                paths = sorted(
+                    os.path.join(args.input_dir, name)
+                    for name in os.listdir(args.input_dir)
+                    if name.endswith(".csv")
+                )
+                if not paths:
+                    raise OSError(f"no .csv files found in {args.input_dir}")
+
+            airports = load_airports(args.airports)
+            records, errors = read_csv_files(paths, airports)
+
+            output_path = args.output or "db.json"
+            save_database(records, output_path)
+            write_errors(errors, os.path.join(os.path.dirname(output_path) or ".", "errors.log"))
+            db = records
+
+        if args.queries:
+            process_queries(db, args.queries, args.response_dir)
+
+        return 0
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())
