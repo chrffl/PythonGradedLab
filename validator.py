@@ -71,9 +71,12 @@ def validate_row(fields: list[str], airports: set[str]) -> str | None:
     return None
 
 def to_record(fields: list[str]) -> dict:
-    """Turn a valid row into a flight record dictionary.
-
-    Keys: flight_id, origin, destination, departure_datetime,
-    arrival_datetime (stripped strings) and price (float).
-    """
-    raise NotImplementedError
+    flight_id, origin, destination, departure, arrival, price = [f.strip() for f in fields]
+    return {
+        "flight_id": flight_id,
+        "origin": origin,
+        "destination": destination,
+        "departure_datetime": departure,
+        "arrival_datetime": arrival,
+        "price": float(price),
+    }
