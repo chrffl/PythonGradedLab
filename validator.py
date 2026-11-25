@@ -2,12 +2,14 @@
 
 
 def load_airports(path: str) -> set[str]:
-    """Read an airport list file and return the set of codes.
-
-    One code per line. Strip whitespace; skip blank lines and lines
-    starting with '#'.
-    """
-    raise NotImplementedError
+    airports = set()
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            airports.add(line)
+    return airports
 
 
 def validate_row(fields: list[str], airports: set[str]) -> str | None:
