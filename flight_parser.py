@@ -36,5 +36,13 @@ def parse_arguments(argv):
 
     return args
 
+def read_csv_files(paths, airports):
+    return parse_files(paths, airports)
+
+
+def save_database(records, path):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(records, f, indent=2)
+
 if __name__ == "__main__":
     sys.exit(main())
