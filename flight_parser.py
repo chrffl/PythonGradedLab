@@ -1,9 +1,13 @@
-"""Flight Schedule Parser and Query Tool - command-line entry point.
-
-Run from the project folder, for example:
-    python flight_parser.py -i data/db.csv -a data/airports.txt
-"""
+import argparse
+import json
+import logging
+import os
 import sys
+from datetime import datetime
+
+from csv_loader import parse_files
+from query import run_queries
+from validator import load_airports
 
 # TODO: fill in your details: plain ASCII, no spaces or underscores.
 STUDENT_ID = "260ADB159"
@@ -11,20 +15,26 @@ FIRST_NAME = "Polina"
 LAST_NAME = "Pavlova"
 
 
-def main(argv: list[str] | None = None) -> int:
-    """Run the whole program and return the exit code (0, 1 or 2).
+def parse_arguments(argv):
+    parser = argparse.ArgumentParser(description="Flight Schedule Parser and Query Tool")
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("-i", dest="input_file")
+    source.add_argument("-d", dest="input_dir")
+    source.add_argument("-j", dest="json_db")
+    parser.add_argument("-a", dest="airports")
+    parser.add_argument("-o", dest="output")
+    parser.add_argument("-q", dest="queries")
+    parser.add_argument("-r", dest="response_dir", default=".")
 
-    argv is the argument list without the program name.
-    None means use sys.argv[1:] (argparse does this for you).
-    Do not call sys.exit() inside main(); return the code instead.
-    """
-    # TODO: parse arguments with argparse (-i, -d, -j, -a, -o, -q, -r).
-    # TODO: load or parse the data, write the database and errors.log.
-    # TODO: run the queries and write the response file.
-    # Remember: remove and close the logging handler before returning,
-    # also when returning early because of an error (use try/finally).
-    raise NotImplementedError("main() is not written yet")
+    args = parser.parse_args(argv)
 
+    if (args.input_file or args.input_dir) and not args.airports:
+        parser.error("-a is required with -i or -d")
+
+    if args.json_db and args.output is not None:
+        parser.error("-o cannot be used with -j")
+
+    return args
 
 if __name__ == "__main__":
     sys.exit(main())
