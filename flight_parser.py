@@ -72,5 +72,27 @@ def write_errors(messages, log_path):
         handler.close()
 #Using CHATGPT
 
+def load_database(path):
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError(f"{path} must contain a JSON array")
+    return data
+
+def process_queries(db, queries_path, response_dir):
+    with open(queries_path, encoding="utf-8") as f:
+        queries = json.load(f)
+
+    if not isinstance(queries, (dict, list)):
+        raise ValueError(f"{queries_path} must contain a query object or a list of query objects")
+
+    responses = run_queries(db, queries)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    filename = f"response_{STUDENT_ID}_{FIRST_NAME}_{LAST_NAME}_{timestamp}.json"
+    with open(os.path.join(response_dir, filename), "w", encoding="utf-8") as f:
+        json.dump(responses, f, indent=2)
+
+
 if __name__ == "__main__":
     sys.exit(main())
