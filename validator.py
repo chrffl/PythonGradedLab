@@ -7,7 +7,7 @@ AIRPORT_CODE_RE = re.compile(r"^[A-Z]{3}$")
 DATETIME_RE = re.compile(r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$")
 
 def parse_datetime(text: str):
-    if not DATETIME_RE.match(text):
+    if not DATETIME_RE.fullmatch(text):
         return None
     try:
         return datetime.strptime(text, "%Y-%m-%d %H:%M")
@@ -34,13 +34,13 @@ def validate_row(fields: list[str], airports: set[str]) -> str | None:
     if not flight_id or not origin or not destination or not departure or not arrival or not price:
         return "MISSING_FIELD"
 
-    if not FLIGHT_ID_RE.match(flight_id):
+    if not FLIGHT_ID_RE.fullmatch(flight_id):
         return "INVALID_FLIGHT_ID"
 
-    if not AIRPORT_CODE_RE.match(origin) or origin not in airports:
+    if not AIRPORT_CODE_RE.fullmatch(origin) or origin not in airports:
         return "INVALID_ORIGIN"
 
-    if not AIRPORT_CODE_RE.match(destination) or destination not in airports:
+    if not AIRPORT_CODE_RE.fullmatch(destination) or destination not in airports:
         return "INVALID_DESTINATION"
 
     if origin == destination:
